@@ -12,9 +12,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'),
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const username = configService.get<string>('MONGO_ROOT_USERNAME');
+        const password = configService.get<string>('MONGO_ROOT_PASSWORD');
+        const mongoUri = `mongodb://${username}:${password}@localhost:27017`;
+
+        return {
+          uri: mongoUri,
+        };
+      },
     }),
   ],
   controllers: [AppController],
