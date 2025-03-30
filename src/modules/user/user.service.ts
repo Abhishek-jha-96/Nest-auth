@@ -28,19 +28,37 @@ export class UserService {
     return user.save();
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(page: number = 1, limit: number = 10) {
+    const users = await this.userModel
+      .find({}, { password: 0 }) // Exclude sensitive fields like 'password'
+      .skip((page - 1) * limit) // Skip records for pagination
+      .limit(limit) // Limit the number of results
+      .lean(); // Convert to plain JavaScript objects for better performance
+
+    return users;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    const user = this.userModel.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = this.userModel.findByIdAndUpdate(
+      id,
+      { name: updateUserDto.name },
+      { new: true },
+    );
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    this.userModel.findByIdAndDelete(id);
   }
 }
