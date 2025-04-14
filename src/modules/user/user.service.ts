@@ -28,6 +28,10 @@ export class UserService {
     return user.save();
   }
 
+  async findOneByEmail(email: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ email });
+  }
+
   async findAll(page: number = 1, limit: number = 10) {
     const users = await this.userModel
       .find({}, { password: 0 }) // Exclude sensitive fields like 'password'
